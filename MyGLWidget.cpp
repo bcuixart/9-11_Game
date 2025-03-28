@@ -79,21 +79,45 @@ void MyGLWidget::paintGL ()
   // Esborrem el frame-buffer
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  modelTransform();
+  modelTransform(tower_N_Pos);
+  glBindVertexArray(VAO_Tower_N);
+  glDrawArrays(GL_TRIANGLES, 0, model_Tower_N.faces().size() * 3);
+
+  modelTransform (tower_S_Pos);
   glBindVertexArray (VAO_Tower_S);
   glDrawArrays(GL_TRIANGLES, 0, model_Tower_S.faces().size() * 3);
 
-  //modelTransform ();
-  //glBindVertexArray (VAO_Terra);
-  //glDrawArrays(GL_TRIANGLES, 0, 6);
-  //glBindVertexArray (0);
+  modelTransform (glm::vec3(0,0,0));
+  glBindVertexArray (VAO_Ground);
+  glDrawArrays(GL_TRIANGLES, 0, 6);
+
+  glBindVertexArray (0);
 }
 
 void MyGLWidget::creaBuffers () 
 {
+    model_Tower_N.load("./Assets/Models/Tower_N.obj");
     model_Tower_S.load("./Assets/Models/Tower_S.obj");
 
-    // Creació del Vertex Array Object per pintar
+    // NORTH TOWER
+    glGenVertexArrays(1, &VAO_Tower_N);
+    glBindVertexArray(VAO_Tower_N);
+
+    GLuint VBO_Tower_N[2];
+    glGenBuffers(2, VBO_Tower_N);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO_Tower_N[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * model_Tower_N.faces().size() * 3 * 3, model_Tower_N.VBO_vertices(), GL_STATIC_DRAW);
+
+    glVertexAttribPointer(vertexLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(vertexLoc);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO_Tower_N[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * model_Tower_N.faces().size() * 3 * 3, model_Tower_N.VBO_matdiff(), GL_STATIC_DRAW);
+
+    glVertexAttribPointer(colorLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(colorLoc);
+
+    // SOUTH TOWER
     glGenVertexArrays(1, &VAO_Tower_S);
     glBindVertexArray(VAO_Tower_S);
 
@@ -102,18 +126,47 @@ void MyGLWidget::creaBuffers ()
     glBindBuffer(GL_ARRAY_BUFFER, VBO_Tower_S[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * model_Tower_S.faces().size() * 3 * 3, model_Tower_S.VBO_vertices(), GL_STATIC_DRAW);
 
-    // Activem l'atribut vertexLoc
     glVertexAttribPointer(vertexLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(vertexLoc);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO_Tower_S[1]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * model_Tower_S.faces().size() * 3 * 3, model_Tower_S.VBO_matdiff(), GL_STATIC_DRAW);
 
-    // Activem l'atribut colorLoc
     glVertexAttribPointer(colorLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(colorLoc);
- 
-    glBindVertexArray (0);
+
+    // GROUND
+    glBindVertexArray(0);
+
+    glm::vec3 ground_Color[6] = {
+        glm::vec3(1,0,0),
+        glm::vec3(0,1,0),
+        glm::vec3(0,0,1),
+        glm::vec3(1,0,0),
+        glm::vec3(0,0,1),
+        glm::vec3(0,1,0),
+    };
+
+    glGenVertexArrays(1, &VAO_Ground);
+    glBindVertexArray(VAO_Ground);
+
+    GLuint VBO_Ground[2];
+    glGenBuffers(2, VBO_Ground);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO_Ground[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(model_Ground_Vertexs), model_Ground_Vertexs, GL_STATIC_DRAW);
+
+    // Activem l'atribut vertexLoc
+    glVertexAttribPointer(vertexLocGround, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(vertexLocGround);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO_Ground[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(ground_Color), ground_Color, GL_STATIC_DRAW);
+
+    // Activem l'atribut colorLoc
+    glVertexAttribPointer(colorLocGround, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(colorLocGround);
+
+    glBindVertexArray(0);
 }
 
 void MyGLWidget::initializeGL() {
@@ -133,15 +186,17 @@ void MyGLWidget::carregaShaders() {
 
     projLoc = glGetUniformLocation(program->programId(), "PM");
     viewLoc = glGetUniformLocation(program->programId(), "VM");
+    vertexLocGround = glGetAttribLocation(program->programId(), "vertex");
+    colorLocGround = glGetAttribLocation(program->programId(), "color");
 }
 
 void MyGLWidget::ini_camera() 
 {
-    VRP = centre;
-    OBS = centre + glm::vec3(0,0,2*radi);
-    UP = glm::vec3(0,1,0);
+    VRP = glm::vec3(0, 20, 0);
+    OBS = glm::vec3(0, 20, 2*radi);
+    UP = glm::vec3(0, 1, 0);
 
-    D = glm::distance(VRP, OBS);
+    D = 2 * radi;
 
     viewTransform();
 
@@ -159,10 +214,11 @@ void MyGLWidget::ini_camera()
     projectTransform();
 }
 
-void MyGLWidget::modelTransform () 
+void MyGLWidget::modelTransform (glm::vec3 position)
 {
-  glm::mat4 transform (1.0f);
-  glUniformMatrix4fv(transLoc, 1, GL_FALSE, &transform[0][0]);
+    glm::mat4 transform(1.0f);
+    transform = glm::translate(transform, position);
+    glUniformMatrix4fv(transLoc, 1, GL_FALSE, &transform[0][0]);
 }
 
 void MyGLWidget::projectTransform() {
@@ -178,5 +234,6 @@ void MyGLWidget::viewTransform() {
 void MyGLWidget::resizeGL (int width, int height) 
 {
     RA = (float)width / (float)height;
+    ini_camera();
 }
 
