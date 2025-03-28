@@ -1,6 +1,6 @@
 # 9-11 Game [WIP] (May be offensive)
 ## Lore
-On September 11th, 2001, two planes crashed against the Twin Towers in New York, bringing them both down, in a terrorist attack by Al-Qaeda.
+On September 11th, 2001, two planes crashed against the Twin Towers in New York, bringing them down, in a terrorist attack by Al-Qaeda.
 
 There were also two other planes, but nobody gives a fuck about those.
 
