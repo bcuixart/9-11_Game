@@ -2,7 +2,7 @@
 ## Lore
 On September 11th, 2001, two planes crashed against the Twin Towers in New York, bringing them down, in a terrorist attack by Al-Qaeda.
 
-There were also two other planes, but nobody gives a fuck about those.
+There were also another two planes, but nobody gives a fuck about those.
 
 When the US president, George Bush, was told about the attack, his response was: "Really? Aw, dang it. Well, I guess we'll just fucking build another pair of Twin Towers"
 
