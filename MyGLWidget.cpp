@@ -54,9 +54,11 @@ void MyGLWidget::keyPressEvent(QKeyEvent* event)
       break;
     }
     case Qt::Key_D: {
+        plane_Rot_Y = (plane_Rot_Y - PLANE_ROTATE_SPEED) % 360;
       break;
     }
     case Qt::Key_A: {
+        plane_Rot_Y = (plane_Rot_Y + PLANE_ROTATE_SPEED) % 360;
       break;
     }
     case Qt::Key_W: {
@@ -64,7 +66,6 @@ void MyGLWidget::keyPressEvent(QKeyEvent* event)
     }
     default: event->ignore(); break;
   }
-  update();
 }
 
 MyGLWidget::~MyGLWidget() {
@@ -79,25 +80,35 @@ void MyGLWidget::paintGL ()
   // Esborrem el frame-buffer
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  modelTransform(tower_N_Pos);
+  modelTransform(tower_N_Pos, 0, 0);
   glBindVertexArray(VAO_Tower_N);
   glDrawArrays(GL_TRIANGLES, 0, model_Tower_N.faces().size() * 3);
 
-  modelTransform (tower_S_Pos);
+  modelTransform (tower_S_Pos, 0, 0);
   glBindVertexArray (VAO_Tower_S);
   glDrawArrays(GL_TRIANGLES, 0, model_Tower_S.faces().size() * 3);
 
-  modelTransform (glm::vec3(0,0,0));
+  float rotation_Radians = float(glm::radians(float(plane_Rot_Y)));
+  plane_Pos = plane_Pos + glm::vec3(PLANE_MOVE_SPEED * cos(rotation_Radians), 0, -PLANE_MOVE_SPEED * sin(rotation_Radians));
+  modelTransform(plane_Pos, rotation_Radians, plane_Rot_Z);
+  glBindVertexArray(VAO_Plane);
+  glDrawArrays(GL_TRIANGLES, 0, model_Plane.faces().size() * 3);
+
+  modelTransform (glm::vec3(0,0,0), 0, 0);
   glBindVertexArray (VAO_Ground);
   glDrawArrays(GL_TRIANGLES, 0, 6);
 
   glBindVertexArray (0);
+
+  ini_camera();
+  update();
 }
 
 void MyGLWidget::creaBuffers () 
 {
     model_Tower_N.load("./Assets/Models/Tower_N.obj");
     model_Tower_S.load("./Assets/Models/Tower_S.obj");
+    model_Plane.load("./Assets/Models/Plane.obj");
 
     // NORTH TOWER
     glGenVertexArrays(1, &VAO_Tower_N);
@@ -131,6 +142,24 @@ void MyGLWidget::creaBuffers ()
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO_Tower_S[1]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * model_Tower_S.faces().size() * 3 * 3, model_Tower_S.VBO_matdiff(), GL_STATIC_DRAW);
+
+    glVertexAttribPointer(colorLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(colorLoc);
+
+    // PLANE
+    glGenVertexArrays(1, &VAO_Plane);
+    glBindVertexArray(VAO_Plane);
+
+    GLuint VBO_Plane[2];
+    glGenBuffers(2, VBO_Plane);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO_Plane[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * model_Plane.faces().size() * 3 * 3, model_Plane.VBO_vertices(), GL_STATIC_DRAW);
+
+    glVertexAttribPointer(vertexLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(vertexLoc);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO_Plane[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * model_Plane.faces().size() * 3 * 3, model_Plane.VBO_matdiff(), GL_STATIC_DRAW);
 
     glVertexAttribPointer(colorLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(colorLoc);
@@ -192,8 +221,13 @@ void MyGLWidget::carregaShaders() {
 
 void MyGLWidget::ini_camera() 
 {
-    VRP = glm::vec3(0, 20, 0);
-    OBS = glm::vec3(0, 20, 2*radi);
+    //VRP = glm::vec3(0, 30, 0);
+    //OBS = glm::vec3(0, 20, 2*radi);
+
+    float rotation_Radians = float(glm::radians(float(plane_Rot_Y)));
+    //OBS = plane_Pos;
+    OBS = plane_Pos + glm::vec3(0, 1, 0);
+    VRP = plane_Pos + glm::vec3(10 * cos(rotation_Radians), 0, -10 * sin(rotation_Radians));
     UP = glm::vec3(0, 1, 0);
 
     D = 2 * radi;
@@ -208,16 +242,20 @@ void MyGLWidget::ini_camera()
     
     if (FOV_ORIGINAL == -1) FOV_ORIGINAL = FOV;
     
-    ZNEAR = D - radi;
-    ZFAR = D + radi;
+    //ZNEAR = D - radi;
+    //ZFAR = D + radi;
+    ZNEAR = 01;
+    ZFAR = 10000;
 
     projectTransform();
 }
 
-void MyGLWidget::modelTransform (glm::vec3 position)
+void MyGLWidget::modelTransform (glm::vec3 position, float rotationY, float rotationZ)
 {
     glm::mat4 transform(1.0f);
     transform = glm::translate(transform, position);
+    transform = glm::rotate(transform, rotationY, glm::vec3(0, 1, 0));
+    transform = glm::rotate(transform, rotationZ, glm::vec3(0, 0, 1));
     glUniformMatrix4fv(transLoc, 1, GL_FALSE, &transform[0][0]);
 }
 
