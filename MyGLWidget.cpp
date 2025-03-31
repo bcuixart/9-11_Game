@@ -84,6 +84,11 @@ void MyGLWidget::paintGL ()
   glBindVertexArray(VAO_Tower_N);
   glDrawArrays(GL_TRIANGLES, 0, model_Tower_N.faces().size() * 3);
 
+  if (DEBUG_SHOW_HITBOXES) {
+    glBindVertexArray(VAO_Debug_Hitbox_Tower_N);
+    glDrawArrays(GL_TRIANGLES, 0, model_Debug_Tower.faces().size() * 3);
+  }
+
   modelTransform (tower_S_Pos, 0, 0);
   glBindVertexArray (VAO_Tower_S);
   glDrawArrays(GL_TRIANGLES, 0, model_Tower_S.faces().size() * 3);
@@ -109,6 +114,7 @@ void MyGLWidget::creaBuffers ()
     model_Tower_N.load("./Assets/Models/Tower_N.obj");
     model_Tower_S.load("./Assets/Models/Tower_S.obj");
     model_Plane.load("./Assets/Models/Plane.obj");
+    model_Debug_Tower.load("./Assets/Models/Tower_Hitbox.obj");
 
     // NORTH TOWER
     glGenVertexArrays(1, &VAO_Tower_N);
@@ -160,6 +166,24 @@ void MyGLWidget::creaBuffers ()
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO_Plane[1]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * model_Plane.faces().size() * 3 * 3, model_Plane.VBO_matdiff(), GL_STATIC_DRAW);
+
+    glVertexAttribPointer(colorLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(colorLoc);
+
+    // DEBUG TOWER NORTH
+    glGenVertexArrays(1, &VAO_Debug_Hitbox_Tower_N);
+    glBindVertexArray(VAO_Debug_Hitbox_Tower_N);
+
+    GLuint VBO_Tower_Debug_N[2];
+    glGenBuffers(2, VBO_Tower_Debug_N);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO_Tower_Debug_N[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * model_Debug_Tower.faces().size() * 3 * 3, model_Debug_Tower.VBO_vertices(), GL_STATIC_DRAW);
+
+    glVertexAttribPointer(vertexLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(vertexLoc);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO_Tower_Debug_N[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * model_Debug_Tower.faces().size() * 3 * 3, model_Debug_Tower.VBO_matdiff(), GL_STATIC_DRAW);
 
     glVertexAttribPointer(colorLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(colorLoc);

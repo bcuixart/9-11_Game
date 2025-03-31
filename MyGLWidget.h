@@ -41,8 +41,8 @@ class MyGLWidget : public BL2GLWidget {
         glm::vec3(-10, -1.0, -10)
     };
 
-    glm::vec3 tower_N_Pos = glm::vec3(6.4, 0, 0);
-    glm::vec3 tower_S_Pos = glm::vec3(-6.4, 0, 0);
+    glm::vec3 tower_N_Pos = glm::vec3(0, 0, 6.4);
+    glm::vec3 tower_S_Pos = glm::vec3(0, 0, -6.4);
     
     GLuint projLoc;
     GLuint viewLoc;
@@ -76,4 +76,10 @@ class MyGLWidget : public BL2GLWidget {
     float ZNEAR;
     float ZFAR;
     float D = 0;
+
+    // DEBUG SHIT
+    const bool DEBUG_SHOW_HITBOXES = true;
+    Model model_Debug_Tower;
+    GLuint VAO_Debug_Hitbox_Tower_N;
+    GLuint VAO_Debug_Hitbox_Tower_S;
 };
