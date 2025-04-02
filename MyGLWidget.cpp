@@ -93,14 +93,23 @@ void MyGLWidget::paintGL ()
   glBindVertexArray (VAO_Tower_S);
   glDrawArrays(GL_TRIANGLES, 0, model_Tower_S.faces().size() * 3);
 
+  if (DEBUG_SHOW_HITBOXES) {
+    glBindVertexArray(VAO_Debug_Hitbox_Tower_S);
+    glDrawArrays(GL_TRIANGLES, 0, model_Debug_Tower.faces().size() * 3);
+  }
+
   float rotation_Radians = float(glm::radians(float(plane_Rot_Y)));
   plane_Pos = plane_Pos + glm::vec3(PLANE_MOVE_SPEED * cos(rotation_Radians), 0, -PLANE_MOVE_SPEED * sin(rotation_Radians));
   modelTransform(plane_Pos, rotation_Radians, plane_Rot_Z);
   glBindVertexArray(VAO_Plane);
   glDrawArrays(GL_TRIANGLES, 0, model_Plane.faces().size() * 3);
 
-  if (isPlaneInTower(tower_N_Pos)) std::cerr << "Boom torre N" << std::endl;
-  else if (isPlaneInTower(tower_S_Pos)) std::cerr << "Boom torre S" << std::endl;
+  bool col_Tower_N = isPlaneInTower(tower_N_Pos);
+  bool col_Tower_S = isPlaneInTower(tower_S_Pos);
+  if (DEBUG_PRINT_COLLISIONS) {
+    if (col_Tower_N) std::cerr << "Boom torre N" << std::endl;
+    if (col_Tower_S) std::cerr << "Boom torre S" << std::endl;
+  }
 
   if (DEBUG_SHOW_HITBOXES) {
     glBindVertexArray(VAO_Debug_Hitbox_Plane);
@@ -197,6 +206,23 @@ void MyGLWidget::creaBuffers ()
     glVertexAttribPointer(colorLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(colorLoc);
 
+    // DEBUG TOWER SOUTH
+    glGenVertexArrays(1, &VAO_Debug_Hitbox_Tower_S);
+    glBindVertexArray(VAO_Debug_Hitbox_Tower_S);
+
+    GLuint VBO_Tower_Debug_S[2];
+    glGenBuffers(2, VBO_Tower_Debug_S);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO_Tower_Debug_S[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * model_Debug_Tower.faces().size() * 3 * 3, model_Debug_Tower.VBO_vertices(), GL_STATIC_DRAW);
+
+    glVertexAttribPointer(vertexLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(vertexLoc);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO_Tower_Debug_S[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * model_Debug_Tower.faces().size() * 3 * 3, model_Debug_Tower.VBO_matdiff(), GL_STATIC_DRAW);
+
+    glVertexAttribPointer(colorLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(colorLoc);
 
     // DEBUG PLANE
     glGenVertexArrays(1, &VAO_Debug_Hitbox_Plane);

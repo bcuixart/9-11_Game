@@ -80,7 +80,9 @@ class MyGLWidget : public BL2GLWidget {
     float D = 0;
 
     // DEBUG SHIT
-    const bool DEBUG_SHOW_HITBOXES = true;
+    const bool DEBUG_SHOW_HITBOXES = false;
+    const bool DEBUG_PRINT_COLLISIONS = false;
+
     Model model_Debug_Plane;
     Model model_Debug_Tower;
 
