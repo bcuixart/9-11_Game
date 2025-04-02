@@ -54,11 +54,11 @@ void MyGLWidget::keyPressEvent(QKeyEvent* event)
       break;
     }
     case Qt::Key_D: {
-        plane_Rot_Y = (plane_Rot_Y - PLANE_ROTATE_SPEED) % 360;
+        plane_Rot_Y = (plane_Rot_Y - PLANE_ROTATE_INCREMENT) % 360;
       break;
     }
     case Qt::Key_A: {
-        plane_Rot_Y = (plane_Rot_Y + PLANE_ROTATE_SPEED) % 360;
+        plane_Rot_Y = (plane_Rot_Y + PLANE_ROTATE_INCREMENT) % 360;
       break;
     }
     case Qt::Key_W: {
@@ -80,15 +80,19 @@ void MyGLWidget::paintGL ()
   // Esborrem el frame-buffer
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+  glUniform3fv(bendLoc, 1, &tower_N_Bend[0]);
   modelTransform(tower_N_Pos, 0, 0);
   glBindVertexArray(VAO_Tower_N);
   glDrawArrays(GL_TRIANGLES, 0, model_Tower_N.faces().size() * 3);
 
   if (DEBUG_SHOW_HITBOXES) {
+    glUniform3fv(bendLoc, 1, &ZERO_VECTOR[0]);
+    modelTransform(tower_N_Pos + tower_N_Bend, 0, 0);
     glBindVertexArray(VAO_Debug_Hitbox_Tower_N);
     glDrawArrays(GL_TRIANGLES, 0, model_Debug_Tower.faces().size() * 3);
   }
 
+  glUniform3fv(bendLoc, 1, &ZERO_VECTOR[0]);
   modelTransform (tower_S_Pos, 0, 0);
   glBindVertexArray (VAO_Tower_S);
   glDrawArrays(GL_TRIANGLES, 0, model_Tower_S.faces().size() * 3);
@@ -104,7 +108,13 @@ void MyGLWidget::paintGL ()
   glBindVertexArray(VAO_Plane);
   glDrawArrays(GL_TRIANGLES, 0, model_Plane.faces().size() * 3);
 
-  bool col_Tower_N = isPlaneInTower(tower_N_Pos);
+  glm::vec3 forwardVector = glm::normalize(tower_N_Pos - plane_Pos);
+  forwardVector.y = 0;
+  if (tower_N_Bend.length() < TOWER_BEND_MAGNITUDE_MAX) {
+        tower_N_Bend = TOWER_BEND_MAGNITUDE_MAX * forwardVector;
+  }
+
+  bool col_Tower_N = isPlaneInTower(tower_N_Pos + tower_N_Bend);
   bool col_Tower_S = isPlaneInTower(tower_S_Pos);
   if (DEBUG_PRINT_COLLISIONS) {
     if (col_Tower_N) std::cerr << "Boom torre N" << std::endl;
@@ -278,15 +288,18 @@ void MyGLWidget::creaBuffers ()
 
 bool MyGLWidget::isPlaneInTower(glm::vec3 towerPosition) 
 {
-    glm::vec3 p1 = plane_Pos + glm::vec3(cos(plane_Rot_Y) * 0.28115, 0, sin(plane_Rot_Y) * 0.28115);
-    glm::vec3 p2 = plane_Pos + glm::vec3(-cos(plane_Rot_Y) * 0.28115, 0, sin(plane_Rot_Y) * 0.28115);
-    glm::vec3 p3 = plane_Pos + glm::vec3(cos(plane_Rot_Y) * 0.28115, 0, -sin(plane_Rot_Y) * 0.28115);
-    glm::vec3 p4 = plane_Pos + glm::vec3(-cos(plane_Rot_Y) * 0.28115, 0, -sin(plane_Rot_Y) * 0.28115);
+    float C = cos(plane_Rot_Y);
+    float S = sin(plane_Rot_Y);
 
-    float towerMaxX = towerPosition.x + 3.15;
-    float towerMinX = towerPosition.x - 3.15;
-    float towerMaxZ = towerPosition.z + 3.15;
-    float towerMinZ = towerPosition.z - 3.15;
+    glm::vec3 p1 = plane_Pos + glm::vec3(C * PLANE_HITBOX_SIZE, 0, S * PLANE_HITBOX_SIZE);
+    glm::vec3 p2 = plane_Pos + glm::vec3(-C * PLANE_HITBOX_SIZE, 0, S * PLANE_HITBOX_SIZE);
+    glm::vec3 p3 = plane_Pos + glm::vec3(C * PLANE_HITBOX_SIZE, 0, -S * PLANE_HITBOX_SIZE);
+    glm::vec3 p4 = plane_Pos + glm::vec3(-C * PLANE_HITBOX_SIZE, 0, -S * PLANE_HITBOX_SIZE);
+
+    float towerMaxX = towerPosition.x + TOWER_HITBOX_SIZE;
+    float towerMinX = towerPosition.x - TOWER_HITBOX_SIZE;
+    float towerMaxZ = towerPosition.z + TOWER_HITBOX_SIZE;
+    float towerMinZ = towerPosition.z - TOWER_HITBOX_SIZE;
     
     if (p1.x > towerMinX && p1.x < towerMaxX && p1.z > towerMinZ && p1.z < towerMaxZ) return true;
     if (p2.x > towerMinX && p2.x < towerMaxX && p2.z > towerMinZ && p2.z < towerMaxZ) return true;
@@ -315,6 +328,7 @@ void MyGLWidget::carregaShaders() {
     viewLoc = glGetUniformLocation(program->programId(), "VM");
     vertexLocGround = glGetAttribLocation(program->programId(), "vertex");
     colorLocGround = glGetAttribLocation(program->programId(), "color");
+    bendLoc = glGetUniformLocation(program->programId(), "bend");
 }
 
 void MyGLWidget::ini_camera() 
@@ -342,8 +356,8 @@ void MyGLWidget::ini_camera()
     
     //ZNEAR = D - radi;
     //ZFAR = D + radi;
-    ZNEAR = 01;
-    ZFAR = 10000;
+    ZNEAR = 1;
+    ZFAR = 100;
 
     projectTransform();
 }

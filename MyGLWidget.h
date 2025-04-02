@@ -45,9 +45,13 @@ class MyGLWidget : public BL2GLWidget {
 
     glm::vec3 tower_N_Pos = glm::vec3(0, 0, 6.4);
     glm::vec3 tower_S_Pos = glm::vec3(0, 0, -6.4);
+
+    const float TOWER_BEND_MAGNITUDE_MAX = 10;
+    glm::vec3 tower_N_Bend = glm::vec3(0,0,0);
     
     GLuint projLoc;
     GLuint viewLoc;
+    GLuint bendLoc;
 
     GLuint VAO_Tower_N;
     GLuint VAO_Tower_S;
@@ -62,7 +66,12 @@ class MyGLWidget : public BL2GLWidget {
     int plane_Rot_Y = 0;
 
     const float PLANE_MOVE_SPEED = 0.05;
-    const int PLANE_ROTATE_SPEED = 1;
+    const int PLANE_ROTATE_INCREMENT = 1;
+
+    const float PLANE_HITBOX_SIZE = 0.28115;
+    const float TOWER_HITBOX_SIZE = 3.15;
+
+    const glm::vec3 ZERO_VECTOR = glm::vec3(0,0,0);
 
     // CAMERA DATA
     float radi = 25;
@@ -80,8 +89,8 @@ class MyGLWidget : public BL2GLWidget {
     float D = 0;
 
     // DEBUG SHIT
-    const bool DEBUG_SHOW_HITBOXES = false;
-    const bool DEBUG_PRINT_COLLISIONS = false;
+    const bool DEBUG_SHOW_HITBOXES = true;
+    const bool DEBUG_PRINT_COLLISIONS = true;
 
     Model model_Debug_Plane;
     Model model_Debug_Tower;
