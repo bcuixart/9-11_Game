@@ -99,6 +99,14 @@ void MyGLWidget::paintGL ()
   glBindVertexArray(VAO_Plane);
   glDrawArrays(GL_TRIANGLES, 0, model_Plane.faces().size() * 3);
 
+  if (isPlaneInTower(tower_N_Pos)) std::cerr << "Boom torre N" << std::endl;
+  else if (isPlaneInTower(tower_S_Pos)) std::cerr << "Boom torre S" << std::endl;
+
+  if (DEBUG_SHOW_HITBOXES) {
+    glBindVertexArray(VAO_Debug_Hitbox_Plane);
+    glDrawArrays(GL_TRIANGLES, 0, model_Debug_Plane.faces().size() * 3);
+  }
+
   modelTransform (glm::vec3(0,0,0), 0, 0);
   glBindVertexArray (VAO_Ground);
   glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -115,6 +123,7 @@ void MyGLWidget::creaBuffers ()
     model_Tower_S.load("./Assets/Models/Tower_S.obj");
     model_Plane.load("./Assets/Models/Plane.obj");
     model_Debug_Tower.load("./Assets/Models/Tower_Hitbox.obj");
+    model_Debug_Plane.load("./Assets/Models/Plane_Hitbox.obj");
 
     // NORTH TOWER
     glGenVertexArrays(1, &VAO_Tower_N);
@@ -188,6 +197,25 @@ void MyGLWidget::creaBuffers ()
     glVertexAttribPointer(colorLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(colorLoc);
 
+
+    // DEBUG PLANE
+    glGenVertexArrays(1, &VAO_Debug_Hitbox_Plane);
+    glBindVertexArray(VAO_Debug_Hitbox_Plane);
+
+    GLuint VBO_Plane_Debug[2];
+    glGenBuffers(2, VBO_Plane_Debug);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO_Plane_Debug[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * model_Debug_Plane.faces().size() * 3 * 3, model_Debug_Plane.VBO_vertices(), GL_STATIC_DRAW);
+
+    glVertexAttribPointer(vertexLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(vertexLoc);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO_Tower_Debug_N[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * model_Debug_Plane.faces().size() * 3 * 3, model_Debug_Plane.VBO_matdiff(), GL_STATIC_DRAW);
+
+    glVertexAttribPointer(colorLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(colorLoc);
+
     // GROUND
     glBindVertexArray(0);
 
@@ -220,6 +248,26 @@ void MyGLWidget::creaBuffers ()
     glEnableVertexAttribArray(colorLocGround);
 
     glBindVertexArray(0);
+}
+
+bool MyGLWidget::isPlaneInTower(glm::vec3 towerPosition) 
+{
+    glm::vec3 p1 = plane_Pos + glm::vec3(cos(plane_Rot_Y) * 0.28115, 0, sin(plane_Rot_Y) * 0.28115);
+    glm::vec3 p2 = plane_Pos + glm::vec3(-cos(plane_Rot_Y) * 0.28115, 0, sin(plane_Rot_Y) * 0.28115);
+    glm::vec3 p3 = plane_Pos + glm::vec3(cos(plane_Rot_Y) * 0.28115, 0, -sin(plane_Rot_Y) * 0.28115);
+    glm::vec3 p4 = plane_Pos + glm::vec3(-cos(plane_Rot_Y) * 0.28115, 0, -sin(plane_Rot_Y) * 0.28115);
+
+    float towerMaxX = towerPosition.x + 3.15;
+    float towerMinX = towerPosition.x - 3.15;
+    float towerMaxZ = towerPosition.z + 3.15;
+    float towerMinZ = towerPosition.z - 3.15;
+    
+    if (p1.x > towerMinX && p1.x < towerMaxX && p1.z > towerMinZ && p1.z < towerMaxZ) return true;
+    if (p2.x > towerMinX && p2.x < towerMaxX && p2.z > towerMinZ && p2.z < towerMaxZ) return true;
+    if (p3.x > towerMinX && p3.x < towerMaxX && p3.z > towerMinZ && p3.z < towerMaxZ) return true;
+    if (p4.x > towerMinX && p4.x < towerMaxX && p4.z > towerMinZ && p4.z < towerMaxZ) return true;
+
+    return false;
 }
 
 void MyGLWidget::initializeGL() {

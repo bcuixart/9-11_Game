@@ -18,6 +18,8 @@ class MyGLWidget : public BL2GLWidget {
     virtual void keyPressEvent(QKeyEvent* event);
     virtual void resizeGL (int width, int height);
 
+    bool isPlaneInTower(glm::vec3 towerPosition);
+
     void modelTransform(glm::vec3 position, float rotationY, float rotationZ);
 
     void carregaShaders();
@@ -79,7 +81,10 @@ class MyGLWidget : public BL2GLWidget {
 
     // DEBUG SHIT
     const bool DEBUG_SHOW_HITBOXES = true;
+    Model model_Debug_Plane;
     Model model_Debug_Tower;
+
+    GLuint VAO_Debug_Hitbox_Plane;
     GLuint VAO_Debug_Hitbox_Tower_N;
     GLuint VAO_Debug_Hitbox_Tower_S;
 };
