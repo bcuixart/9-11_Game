@@ -47,7 +47,7 @@ private:
     glm::vec3 tower_S_Pos = glm::vec3(0, 0, -6.4);
 
     const float TOWER_BEND_MAGNITUDE_MAX = 12;
-    const float TOWER_BEND_SPEED = 0.02;
+    const float TOWER_BEND_SPEED = 0.08;
     glm::vec3 tower_N_Bend = glm::vec3(0, 0, 0);
     glm::vec3 tower_N_Expected_Bend = glm::vec3(0, 0, 0);
     glm::vec3 tower_S_Bend = glm::vec3(0, 0, 0);
@@ -106,8 +106,4 @@ private:
     GLuint VAO_Debug_Hitbox_Plane;
     GLuint VAO_Debug_Hitbox_Tower_N;
     GLuint VAO_Debug_Hitbox_Tower_S;
-    GLuint VAO_Debug_Bend_Pos_N_1;
-    GLuint VAO_Debug_Bend_Pos_N_2;
-    GLuint VAO_Debug_Bend_Pos_S_1;
-    GLuint VAO_Debug_Bend_Pos_S_2;
 };

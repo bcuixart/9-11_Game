@@ -115,16 +115,15 @@ void MyGLWidget::paintGL ()
   glDrawArrays(GL_TRIANGLES, 0, model_Plane.faces().size() * 3);
 
   glm::vec3 planeHitBoxPos = plane_Pos + glm::vec3(cos(rotation_Radians) * PLANE_HITBOX_POSITION_OFFSET, 0, sin(rotation_Radians) * PLANE_HITBOX_POSITION_OFFSET);
-  //glm::vec3 planeHitBoxPos = plane_Pos;
-  glm::vec3 forwardVector = glm::vec3(cos(rotation_Radians),0, sin(rotation_Radians));
-  //glm::vec3 leftVector = glm::vec3(forwardVector.z, 0, -forwardVector.x);
-  //glm::vec3 rightVector = glm::vec3(-forwardVector.z, 0, forwardVector.x);
-  //glm::vec3 forwardVector = glm::normalize(tower_N_Pos - planeHitBoxPos);
-  //forwardVector.y = 0;
+
+  glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), rotation_Radians, glm::vec3(0.0f, 1.0f, 0.0f));
+  glm::vec3 forwardVector = glm::vec3(rotationMatrix * glm::vec4(1, 0, 0, 1));
+  glm::vec3 leftVector = glm::normalize(glm::cross(glm::vec3(0, 1, 0), forwardVector));
+  glm::vec3 rightVector = -leftVector;
 
   // BEND TOWER N
-  glm::vec3 possibleBendPos_N_1 = tower_N_Pos + glm::cross(forwardVector, glm::vec3(0, 1, 0)) * TOWER_BEND_MAGNITUDE_MAX;
-  glm::vec3 possibleBendPos_N_2 = tower_N_Pos + glm::cross(forwardVector, glm::vec3(0, -1, 0)) * TOWER_BEND_MAGNITUDE_MAX;
+  glm::vec3 possibleBendPos_N_1 = tower_N_Pos + rightVector * TOWER_BEND_MAGNITUDE_MAX;
+  glm::vec3 possibleBendPos_N_2 = tower_N_Pos + leftVector * TOWER_BEND_MAGNITUDE_MAX;
 
   float dist1_N = glm::distance(planeHitBoxPos, possibleBendPos_N_1);
   float dist2_N = glm::distance(planeHitBoxPos, possibleBendPos_N_2);
@@ -137,8 +136,8 @@ void MyGLWidget::paintGL ()
       tower_N_Bend.z > tower_N_Expected_Bend.z ? tower_N_Bend.z - TOWER_BEND_SPEED : tower_N_Bend.z + TOWER_BEND_SPEED);
 
   // BEND TOWER S
-  glm::vec3 possibleBendPos_S_1 = tower_S_Pos + glm::cross(forwardVector, glm::vec3(0, 1, 0)) * TOWER_BEND_MAGNITUDE_MAX;
-  glm::vec3 possibleBendPos_S_2 = tower_S_Pos + glm::cross(forwardVector, glm::vec3(0, -1, 0)) * TOWER_BEND_MAGNITUDE_MAX;
+  glm::vec3 possibleBendPos_S_1 = tower_S_Pos + rightVector * TOWER_BEND_MAGNITUDE_MAX;
+  glm::vec3 possibleBendPos_S_2 = tower_S_Pos + leftVector * TOWER_BEND_MAGNITUDE_MAX;
 
   float dist1_S = glm::distance(planeHitBoxPos, possibleBendPos_S_1);
   float dist2_S = glm::distance(planeHitBoxPos, possibleBendPos_S_2);
@@ -149,17 +148,6 @@ void MyGLWidget::paintGL ()
       glm::vec3(tower_S_Bend.x > tower_S_Expected_Bend.x ? tower_S_Bend.x - TOWER_BEND_SPEED : tower_S_Bend.x + TOWER_BEND_SPEED,
           0,
           tower_S_Bend.z > tower_S_Expected_Bend.z ? tower_S_Bend.z - TOWER_BEND_SPEED : tower_S_Bend.z + TOWER_BEND_SPEED);
-/*
-  if (tower_N_Bend.length() < TOWER_BEND_MAGNITUDE_MAX) {
-        //tower_N_Bend = TOWER_BEND_MAGNITUDE_MAX * forwardVector;
-        //tower_N_Bend = glm::vec3(-tower_N_Bend.z, tower_N_Bend.y, -tower_N_Bend.x);
-      tower_N_Bend = glm::cross(forwardVector, glm::vec3(0, 1, 0)) * TOWER_BEND_MAGNITUDE_MAX;
-  }
-
-  if (tower_S_Bend.length() < TOWER_BEND_MAGNITUDE_MAX) {
-      tower_S_Bend = glm::cross(forwardVector, glm::vec3(0, -1, 0)) * TOWER_BEND_MAGNITUDE_MAX;
-  }
-  */
 
   bool col_Tower_N = isPlaneInTower(tower_N_Pos + tower_N_Bend);
   bool col_Tower_S = isPlaneInTower(tower_S_Pos + tower_S_Bend);
