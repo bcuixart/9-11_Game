@@ -43,11 +43,15 @@ private:
         glm::vec3(-10, -1.0, -10)
     };
 
-    glm::vec3 tower_N_Pos = glm::vec3(0, 0, -6.4);
-    glm::vec3 tower_S_Pos = glm::vec3(0, 0, 6.4);
+    glm::vec3 tower_N_Pos = glm::vec3(0, 0, 6.4);
+    glm::vec3 tower_S_Pos = glm::vec3(0, 0, -6.4);
 
-    const float TOWER_BEND_MAGNITUDE_MAX = 10;
+    const float TOWER_BEND_MAGNITUDE_MAX = 12;
+    const float TOWER_BEND_SPEED = 0.02;
     glm::vec3 tower_N_Bend = glm::vec3(0, 0, 0);
+    glm::vec3 tower_N_Expected_Bend = glm::vec3(0, 0, 0);
+    glm::vec3 tower_S_Bend = glm::vec3(0, 0, 0);
+    glm::vec3 tower_S_Expected_Bend = glm::vec3(0, 0, 0);
 
     GLuint projLoc;
     GLuint viewLoc;
