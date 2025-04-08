@@ -43,8 +43,8 @@ private:
         glm::vec3(-10, -1.0, -10)
     };
 
-    glm::vec3 tower_N_Pos = glm::vec3(0, 0, 6.4);
-    glm::vec3 tower_S_Pos = glm::vec3(0, 0, -6.4);
+    glm::vec3 tower_N_Pos = glm::vec3(0, 0, -6.4);
+    glm::vec3 tower_S_Pos = glm::vec3(0, 0, 6.4);
 
     const float TOWER_BEND_MAGNITUDE_MAX = 10;
     glm::vec3 tower_N_Bend = glm::vec3(0, 0, 0);
@@ -65,11 +65,13 @@ private:
     float plane_Rot_Z = 0;
     int plane_Rot_Y = 0;
 
-    const float PLANE_MOVE_SPEED = 0.05;
+    const float PLANE_MOVE_SPEED_VALUE = 0.05;
     const int PLANE_ROTATE_INCREMENT = 1;
+    float plane_move_speed = PLANE_MOVE_SPEED_VALUE;
 
     const float PLANE_HITBOX_SIZE = 0.28115;
     const float TOWER_HITBOX_SIZE = 3.15;
+    const float PLANE_HITBOX_POSITION_OFFSET = 2.3243;
 
     const glm::vec3 ZERO_VECTOR = glm::vec3(0, 0, 0);
 
@@ -91,6 +93,7 @@ private:
     // DEBUG SHIT
     const bool DEBUG_SHOW_HITBOXES = true;
     const bool DEBUG_PRINT_COLLISIONS = true;
+    const bool DEBUG_CAN_STOP = true;
 
     Model model_Debug_Plane;
     Model model_Debug_Tower;

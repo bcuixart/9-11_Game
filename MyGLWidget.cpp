@@ -64,6 +64,10 @@ void MyGLWidget::keyPressEvent(QKeyEvent* event)
     case Qt::Key_W: {
       break;
     }
+    case Qt::Key_Space: {
+        if (DEBUG_CAN_STOP) plane_move_speed = plane_move_speed == 0 ? PLANE_MOVE_SPEED_VALUE : 0;
+        break;
+    }
     default: event->ignore(); break;
   }
 }
@@ -103,15 +107,18 @@ void MyGLWidget::paintGL ()
   }
 
   float rotation_Radians = float(glm::radians(float(plane_Rot_Y)));
-  plane_Pos = plane_Pos + glm::vec3(PLANE_MOVE_SPEED * cos(rotation_Radians), 0, -PLANE_MOVE_SPEED * sin(rotation_Radians));
+  plane_Pos = plane_Pos + glm::vec3(plane_move_speed * cos(rotation_Radians), 0, -plane_move_speed * sin(rotation_Radians));
   modelTransform(plane_Pos, rotation_Radians, plane_Rot_Z);
   glBindVertexArray(VAO_Plane);
   glDrawArrays(GL_TRIANGLES, 0, model_Plane.faces().size() * 3);
 
-  glm::vec3 forwardVector = glm::normalize(tower_N_Pos - plane_Pos);
+  glm::vec3 forwardVector = glm::normalize(tower_N_Pos - (plane_Pos + glm::vec3(cos(rotation_Radians) * PLANE_HITBOX_POSITION_OFFSET,0, sin(rotation_Radians) * PLANE_HITBOX_POSITION_OFFSET)));
   forwardVector.y = 0;
+  //glm::vec3 forwardVector = glm::vec3(cos(rotation_Radians),0, sin(rotation_Radians));
   if (tower_N_Bend.length() < TOWER_BEND_MAGNITUDE_MAX) {
-        tower_N_Bend = TOWER_BEND_MAGNITUDE_MAX * forwardVector;
+        //tower_N_Bend = TOWER_BEND_MAGNITUDE_MAX * forwardVector;
+        //tower_N_Bend = glm::vec3(-tower_N_Bend.z, tower_N_Bend.y, -tower_N_Bend.x);
+      tower_N_Bend = glm::cross(forwardVector, glm::vec3(0, 1, 0)) * TOWER_BEND_MAGNITUDE_MAX;
   }
 
   bool col_Tower_N = isPlaneInTower(tower_N_Pos + tower_N_Bend);
