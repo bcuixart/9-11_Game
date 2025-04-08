@@ -1,0 +1,5 @@
+*.o
+9-11_Game
+moc_*
+*.swp
+ui_MyForm.h
