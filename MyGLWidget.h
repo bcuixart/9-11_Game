@@ -41,8 +41,8 @@ class MyGLWidget : public BL2GLWidget {
         glm::vec3(-10, -1.0, -10)
     };
 
-    glm::vec3 tower_N_Pos = glm::vec3(6.4, 0, 0);
-    glm::vec3 tower_S_Pos = glm::vec3(-6.4, 0, 0);
+    glm::vec3 tower_N_Pos = glm::vec3(0, 0, 6.4);
+    glm::vec3 tower_S_Pos = glm::vec3(0, 0, -6.4);
     
     GLuint projLoc;
     GLuint viewLoc;
@@ -55,7 +55,7 @@ class MyGLWidget : public BL2GLWidget {
     GLuint colorLocGround;
 
     // PLANE DATA
-    glm::vec3 plane_Pos = glm::vec3(-100, 30, 0);
+    glm::vec3 plane_Pos = glm::vec3(-300, 30, 0);
     float plane_Rot_Z = 0;
     int plane_Rot_Y = 0;
 
