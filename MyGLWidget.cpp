@@ -115,7 +115,10 @@ void MyGLWidget::paintGL ()
   glDrawArrays(GL_TRIANGLES, 0, model_Plane.faces().size() * 3);
 
   glm::vec3 planeHitBoxPos = plane_Pos + glm::vec3(cos(rotation_Radians) * PLANE_HITBOX_POSITION_OFFSET, 0, sin(rotation_Radians) * PLANE_HITBOX_POSITION_OFFSET);
+  //glm::vec3 planeHitBoxPos = plane_Pos;
   glm::vec3 forwardVector = glm::vec3(cos(rotation_Radians),0, sin(rotation_Radians));
+  //glm::vec3 leftVector = glm::vec3(forwardVector.z, 0, -forwardVector.x);
+  //glm::vec3 rightVector = glm::vec3(-forwardVector.z, 0, forwardVector.x);
   //glm::vec3 forwardVector = glm::normalize(tower_N_Pos - planeHitBoxPos);
   //forwardVector.y = 0;
 

@@ -98,6 +98,7 @@ private:
     const bool DEBUG_SHOW_HITBOXES = true;
     const bool DEBUG_PRINT_COLLISIONS = true;
     const bool DEBUG_CAN_STOP = true;
+    const bool DEBUG_SHOW_BEND_POS = true;
 
     Model model_Debug_Plane;
     Model model_Debug_Tower;
@@ -105,4 +106,8 @@ private:
     GLuint VAO_Debug_Hitbox_Plane;
     GLuint VAO_Debug_Hitbox_Tower_N;
     GLuint VAO_Debug_Hitbox_Tower_S;
+    GLuint VAO_Debug_Bend_Pos_N_1;
+    GLuint VAO_Debug_Bend_Pos_N_2;
+    GLuint VAO_Debug_Bend_Pos_S_1;
+    GLuint VAO_Debug_Bend_Pos_S_2;
 };
