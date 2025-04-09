@@ -54,11 +54,11 @@ void MyGLWidget::keyPressEvent(QKeyEvent* event)
       break;
     }
     case Qt::Key_D: {
-        plane_Rot_Y = (plane_Rot_Y - PLANE_ROTATE_INCREMENT) % 360;
+        if (!isInCutscene) plane_Rot_Y = (plane_Rot_Y - PLANE_ROTATE_INCREMENT) % 360;
       break;
     }
     case Qt::Key_A: {
-        plane_Rot_Y = (plane_Rot_Y + PLANE_ROTATE_INCREMENT) % 360;
+        if (!isInCutscene) plane_Rot_Y = (plane_Rot_Y + PLANE_ROTATE_INCREMENT) % 360;
       break;
     }
     case Qt::Key_W: {
@@ -208,6 +208,10 @@ void MyGLWidget::paintGL ()
           tower_S_Can_Move = false;
           tower_S_Can_Bend = true;
       }
+
+      cutsceneCameraPos = tower_N_Pos;
+      isInCutscene = true;
+      cutsceneTimer = CUTSCENE_TIMER_VALUE;
   }
   
   if (col_Tower_S) {
@@ -216,7 +220,14 @@ void MyGLWidget::paintGL ()
           tower_N_Can_Move = false;
           tower_N_Can_Bend = true;
       }
+
+      cutsceneCameraPos = tower_S_Pos;
+      isInCutscene = true;
+      cutsceneTimer = CUTSCENE_TIMER_VALUE;
   }
+
+  if (cutsceneTimer > 0) cutsceneTimer -= 1;
+  if (cutsceneTimer <= 0) isInCutscene = false;
 
   if (DEBUG_PRINT_COLLISIONS) {
     if (col_Tower_N) std::cerr << "Boom torre N" << std::endl;
@@ -439,9 +450,16 @@ void MyGLWidget::ini_camera()
     //OBS = glm::vec3(0, 20, 2*radi);
 
     float rotation_Radians = float(glm::radians(float(plane_Rot_Y)));
-    //OBS = plane_Pos;
-    OBS = plane_Pos + glm::vec3(0, 1, 0);
-    VRP = plane_Pos + glm::vec3(10 * cos(rotation_Radians), 0, -10 * sin(rotation_Radians));
+
+    if (isInCutscene) {
+        OBS = cutsceneCameraPos + glm::vec3(-CUTSCENE_CAMERA_DISTANCE * cos(rotation_Radians), CUTSCENE_CAMERA_HEIGHT_OBS, CUTSCENE_CAMERA_DISTANCE * sin(rotation_Radians));
+        VRP = cutsceneCameraPos + glm::vec3(0, CUTSCENE_CAMERA_HEIGHT_VRP, 0);
+    }
+    else {
+        OBS = plane_Pos + glm::vec3(0, 1, 0);
+        VRP = plane_Pos + glm::vec3(10 * cos(rotation_Radians), 0, -10 * sin(rotation_Radians));
+    }
+
     UP = glm::vec3(0, 1, 0);
 
     D = 2 * radi;

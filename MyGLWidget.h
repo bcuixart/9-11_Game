@@ -34,13 +34,13 @@ private:
     Model model_Plane;
 
     glm::vec3 model_Ground_Vertexs[6] = {
-        glm::vec3(10, -1.0, 10),
-        glm::vec3(-10, -1.0, -10),
-        glm::vec3(-10, -1.0, 10),
+        glm::vec3(1000, -1.0, 1000),
+        glm::vec3(-1000, -1.0, -1000),
+        glm::vec3(-1000, -1.0, 1000),
 
-        glm::vec3(10, -1.0, 10),
-        glm::vec3(10, -1.0, -10),
-        glm::vec3(-10, -1.0, -10)
+        glm::vec3(1000, -1.0, 1000),
+        glm::vec3(1000, -1.0, -1000),
+        glm::vec3(-1000, -1.0, -1000)
     };
 
     glm::vec3 tower_N_Pos = glm::vec3(0, 0, 6.4);
@@ -109,6 +109,16 @@ private:
     float ZNEAR;
     float ZFAR;
     float D = 0;
+
+    // CUTSCENE DATA
+    const float CUTSCENE_CAMERA_DISTANCE = 40;
+    const float CUTSCENE_CAMERA_HEIGHT_OBS = 35;
+    const float CUTSCENE_CAMERA_HEIGHT_VRP = 25;
+    const float CUTSCENE_TIMER_VALUE = 500;
+
+    float cutsceneTimer = 0;
+    bool isInCutscene = false;
+    glm::vec3 cutsceneCameraPos;
 
     // DEBUG SHIT
     const bool DEBUG_SHOW_HITBOXES = false;
