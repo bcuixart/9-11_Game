@@ -46,11 +46,20 @@ private:
     glm::vec3 tower_N_Pos = glm::vec3(0, 0, 6.4);
     glm::vec3 tower_S_Pos = glm::vec3(0, 0, -6.4);
 
+    const float TOWER_MOVE_SPEED = 0.02;
+    const float TOWER_MOVE_DISTANCE = 40;
+    const float TOWER_HEIGHT_INCREMENT = 0.01;
+    const float TOWER_HEIGHT_JUMP_HEIGHT = 5;
+    bool tower_N_Can_Move = true;
+    bool tower_S_Can_Move = true;
+    float tower_N_Height_Lerp = 0;
+    float tower_S_Height_Lerp = 0;
+
     const float TOWER_BEND_MAGNITUDE_MAX = 12;
     const float TOWER_BEND_SPEED = 0.16;
     const float TOWER_BEND_DISTANCE = 35;
-    bool tower_N_Can_Bend = true;
-    bool tower_S_Can_Bend = true;
+    bool tower_N_Can_Bend = false;
+    bool tower_S_Can_Bend = false;
 
     glm::vec3 tower_N_Bend = glm::vec3(0, 0, 0);
     glm::vec3 tower_N_Expected_Bend = glm::vec3(0, 0, 0);

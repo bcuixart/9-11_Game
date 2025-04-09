@@ -85,7 +85,7 @@ void MyGLWidget::paintGL ()
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glUniform3fv(bendLoc, 1, &tower_N_Bend[0]);
-  modelTransform(tower_N_Pos, 0, 0);
+  modelTransform(tower_N_Pos + glm::vec3(0, -TOWER_HEIGHT_JUMP_HEIGHT * tower_N_Height_Lerp * (tower_N_Height_Lerp-1),0), 0, 0);
   glBindVertexArray(VAO_Tower_N);
   glDrawArrays(GL_TRIANGLES, 0, model_Tower_N.faces().size() * 3);
 
@@ -97,7 +97,7 @@ void MyGLWidget::paintGL ()
   }
 
   glUniform3fv(bendLoc, 1, &tower_S_Bend[0]);
-  modelTransform (tower_S_Pos, 0, 0);
+  modelTransform (tower_S_Pos + glm::vec3(0, -TOWER_HEIGHT_JUMP_HEIGHT * tower_S_Height_Lerp * (tower_S_Height_Lerp - 1), 0), 0, 0);
   glBindVertexArray (VAO_Tower_S);
   glDrawArrays(GL_TRIANGLES, 0, model_Tower_S.faces().size() * 3);
 
@@ -117,12 +117,27 @@ void MyGLWidget::paintGL ()
   glm::vec3 planeHitBoxPos = plane_Pos + glm::vec3(cos(rotation_Radians) * PLANE_HITBOX_POSITION_OFFSET, 0, sin(rotation_Radians) * PLANE_HITBOX_POSITION_OFFSET);
   float planeDistN = glm::distance(planeHitBoxPos, tower_N_Pos);
   float planeDistS = glm::distance(planeHitBoxPos, tower_S_Pos);
-  std::cerr << planeDistN << std::endl;
 
   glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), rotation_Radians, glm::vec3(0.0f, 1.0f, 0.0f));
   glm::vec3 forwardVector = glm::vec3(rotationMatrix * glm::vec4(1, 0, 0, 1));
   glm::vec3 leftVector = glm::normalize(glm::cross(glm::vec3(0, 1, 0), forwardVector));
   glm::vec3 rightVector = -leftVector;
+  glm::vec3 planeToTowerNVector = tower_N_Pos - planeHitBoxPos;
+  glm::vec3 planeToTowerSVector = tower_S_Pos - planeHitBoxPos;
+  planeToTowerNVector.y = 0;
+  planeToTowerSVector.y = 0;
+
+  // MOVE TOWER N
+  if (tower_N_Can_Move && planeDistN < TOWER_MOVE_DISTANCE) {
+      tower_N_Pos += planeToTowerNVector * TOWER_MOVE_SPEED;
+
+      tower_N_Height_Lerp += TOWER_HEIGHT_INCREMENT;
+      if (tower_N_Height_Lerp > 1) tower_N_Height_Lerp = 0;
+  }
+  else {
+      if (tower_N_Height_Lerp > 0) tower_N_Height_Lerp += TOWER_HEIGHT_INCREMENT;
+      if (tower_N_Height_Lerp > 1) tower_N_Height_Lerp = 0;
+  }
 
   // BEND TOWER N
   if (tower_N_Can_Bend && planeDistN < TOWER_BEND_DISTANCE) {
@@ -133,16 +148,27 @@ void MyGLWidget::paintGL ()
       float dist2_N = glm::distance(planeHitBoxPos, possibleBendPos_N_2);
       if (dist1_N >= dist2_N) tower_N_Expected_Bend = glm::cross(forwardVector, glm::vec3(0, 1, 0)) * TOWER_BEND_MAGNITUDE_MAX;
       else tower_N_Expected_Bend = glm::cross(forwardVector, glm::vec3(0, -1, 0)) * TOWER_BEND_MAGNITUDE_MAX;
-
-      tower_N_Bend =
-          glm::vec3(tower_N_Bend.x > tower_N_Expected_Bend.x ? tower_N_Bend.x - TOWER_BEND_SPEED : tower_N_Bend.x + TOWER_BEND_SPEED,
-              0,
-              tower_N_Bend.z > tower_N_Expected_Bend.z ? tower_N_Bend.z - TOWER_BEND_SPEED : tower_N_Bend.z + TOWER_BEND_SPEED);
   }
   else {
       tower_N_Expected_Bend = ZERO_VECTOR;
   }
 
+  tower_N_Bend =
+      glm::vec3(tower_N_Bend.x > tower_N_Expected_Bend.x ? tower_N_Bend.x - TOWER_BEND_SPEED : tower_N_Bend.x + TOWER_BEND_SPEED,
+          0,
+          tower_N_Bend.z > tower_N_Expected_Bend.z ? tower_N_Bend.z - TOWER_BEND_SPEED : tower_N_Bend.z + TOWER_BEND_SPEED);
+
+  // MOVE TOWER S
+  if (tower_S_Can_Move && planeDistS < TOWER_MOVE_DISTANCE) {
+      tower_S_Pos += planeToTowerSVector * TOWER_MOVE_SPEED;
+
+      tower_S_Height_Lerp += TOWER_HEIGHT_INCREMENT;
+      if (tower_S_Height_Lerp > 1) tower_S_Height_Lerp = 0;
+  }
+  else {
+      if (tower_S_Height_Lerp > 0) tower_S_Height_Lerp += TOWER_HEIGHT_INCREMENT;
+      if (tower_S_Height_Lerp > 1) tower_S_Height_Lerp = 0;
+  }
 
   // BEND TOWER S
   if (tower_S_Can_Bend && planeDistS < TOWER_BEND_DISTANCE) {
@@ -157,7 +183,6 @@ void MyGLWidget::paintGL ()
   else {
       tower_S_Expected_Bend = ZERO_VECTOR;
   }
-
 
   tower_S_Bend =
       glm::vec3(tower_S_Bend.x > tower_S_Expected_Bend.x ? tower_S_Bend.x - TOWER_BEND_SPEED : tower_S_Bend.x + TOWER_BEND_SPEED,
@@ -407,7 +432,7 @@ void MyGLWidget::ini_camera()
     //ZNEAR = D - radi;
     //ZFAR = D + radi;
     ZNEAR = 1;
-    ZFAR = 100;
+    ZFAR = 10000;
 
     projectTransform();
 }
