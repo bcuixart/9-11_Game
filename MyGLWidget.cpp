@@ -132,12 +132,19 @@ void MyGLWidget::paintGL ()
       if (tower_N_Can_Move && planeDistN < TOWER_MOVE_DISTANCE) {
           tower_N_Pos += planeToTowerNVector * TOWER_MOVE_SPEED;
 
+          if (tower_N_Height_Lerp == 0) sound_Tower_Jump->play();
           tower_N_Height_Lerp += TOWER_HEIGHT_INCREMENT;
-          if (tower_N_Height_Lerp > 1) tower_N_Height_Lerp = 0;
+          if (tower_N_Height_Lerp > 1) {
+              sound_Tower_Thud->play();
+              tower_N_Height_Lerp = 0;
+          }
       }
       else {
           if (tower_N_Height_Lerp > 0) tower_N_Height_Lerp += TOWER_HEIGHT_INCREMENT;
-          if (tower_N_Height_Lerp > 1) tower_N_Height_Lerp = 0;
+          if (tower_N_Height_Lerp > 1) {
+              sound_Tower_Thud->play();
+              tower_N_Height_Lerp = 0;
+          }
       }
   }
   else {
@@ -170,12 +177,19 @@ void MyGLWidget::paintGL ()
       if (tower_S_Can_Move && planeDistS < TOWER_MOVE_DISTANCE) {
           tower_S_Pos += planeToTowerSVector * TOWER_MOVE_SPEED;
 
+          if (tower_S_Height_Lerp == 0) sound_Tower_Jump->play();
           tower_S_Height_Lerp += TOWER_HEIGHT_INCREMENT;
-          if (tower_S_Height_Lerp > 1) tower_S_Height_Lerp = 0;
+          if (tower_S_Height_Lerp > 1) {
+              sound_Tower_Thud->play();
+              tower_S_Height_Lerp = 0;
+          }
       }
       else {
           if (tower_S_Height_Lerp > 0) tower_S_Height_Lerp += TOWER_HEIGHT_INCREMENT;
-          if (tower_S_Height_Lerp > 1) tower_S_Height_Lerp = 0;
+          if (tower_S_Height_Lerp > 1) {
+              sound_Tower_Thud->play();
+              tower_S_Height_Lerp = 0;
+          }
       }
   }
   else {
@@ -207,6 +221,8 @@ void MyGLWidget::paintGL ()
   bool col_Tower_S = tower_S_Alive && isPlaneInTower(tower_S_Pos + tower_S_Bend);
 
   if (col_Tower_N) {
+      sound_Tower_Impact->play();
+
       tower_N_Alive = false;
       if (tower_S_Alive) {
           tower_S_Can_Move = false;
@@ -219,6 +235,8 @@ void MyGLWidget::paintGL ()
   }
   
   if (col_Tower_S) {
+      sound_Tower_Impact->play();
+
       tower_S_Alive = false;
       if (tower_N_Alive) {
           tower_N_Can_Move = false;
@@ -436,6 +454,7 @@ void MyGLWidget::initializeGL() {
     carregaShaders();
     creaBuffers();
     ini_camera();
+    ini_sounds();
 }
 
 void MyGLWidget::carregaShaders() {
@@ -484,6 +503,21 @@ void MyGLWidget::ini_camera()
     ZFAR = 10000;
 
     projectTransform();
+}
+
+void MyGLWidget::ini_sounds() 
+{
+    sound_Tower_Impact->setSource(QUrl::fromLocalFile(QDir::currentPath() + "/Assets/Audio/Audio_Tower_Impact.wav"));
+    sound_Tower_Impact->setLoopCount(1);
+    sound_Tower_Impact->setVolume(0.5f);
+
+    sound_Tower_Jump->setSource(QUrl::fromLocalFile(QDir::currentPath() + "/Assets/Audio/Audio_Tower_Jump001.wav"));
+    sound_Tower_Jump->setLoopCount(1);
+    sound_Tower_Jump->setVolume(0.5f);
+
+    sound_Tower_Thud->setSource(QUrl::fromLocalFile(QDir::currentPath() + "/Assets/Audio/Audio_Tower_Thud001.wav"));
+    sound_Tower_Thud->setLoopCount(1);
+    sound_Tower_Thud->setVolume(0.5f);
 }
 
 void MyGLWidget::modelTransform (glm::vec3 position, float rotationY, float rotationZ)

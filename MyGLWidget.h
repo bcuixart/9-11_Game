@@ -1,6 +1,8 @@
 // MyGLWidget.h
 #include "BL2GLWidget.h"
 #include "model.h"
+#include <QSoundEffect>
+#include <QDir>
 
 class MyGLWidget : public BL2GLWidget {
     Q_OBJECT
@@ -27,6 +29,7 @@ private:
     void viewTransform();
 
     void ini_camera();
+    void ini_sounds();
 
     // MODEL DATA
     Model model_Tower_N;
@@ -49,6 +52,7 @@ private:
     bool tower_S_Alive = true;
 
     //const float TOWER_MOVE_SPEED = 0.02;
+    //const float TOWER_MOVE_SPEED = 0.005;
     const float TOWER_MOVE_SPEED = 0.001;
     const float TOWER_MOVE_DISTANCE = 40;
     const float TOWER_HEIGHT_INCREMENT = 0.01;
@@ -121,9 +125,15 @@ private:
     bool isInCutscene = false;
     glm::vec3 cutsceneCameraPos;
 
+    // SOUNDS
+    QSoundEffect* sound_Tower_Impact = new QSoundEffect;
+    QSoundEffect* sound_Tower_Jump = new QSoundEffect;
+    QSoundEffect* sound_Tower_Thud = new QSoundEffect;
+
+
     // DEBUG SHIT
     const bool DEBUG_SHOW_HITBOXES = false;
-    const bool DEBUG_PRINT_COLLISIONS = true;
+    const bool DEBUG_PRINT_COLLISIONS = false;
     const bool DEBUG_CAN_STOP = false;
 
     Model model_Debug_Plane;

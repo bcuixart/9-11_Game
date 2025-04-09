@@ -1,5 +1,6 @@
 TEMPLATE    = app
 QT         += opengl 
+QT 	   += multimedia
 
 INCLUDEPATH +=  /usr/include/glm
 
