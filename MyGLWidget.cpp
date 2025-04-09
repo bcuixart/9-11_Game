@@ -159,9 +159,11 @@ void MyGLWidget::paintGL ()
   }
 
   tower_N_Bend =
-      glm::vec3(tower_N_Bend.x > tower_N_Expected_Bend.x ? tower_N_Bend.x - TOWER_BEND_SPEED : tower_N_Bend.x + TOWER_BEND_SPEED,
+      glm::vec3(abs(tower_N_Bend.x - tower_N_Expected_Bend.x) < TOWER_BEND_SNAP ? tower_N_Expected_Bend.x :
+            (tower_N_Bend.x > tower_N_Expected_Bend.x ? tower_N_Bend.x - TOWER_BEND_SPEED : tower_N_Bend.x + TOWER_BEND_SPEED),
           0,
-          tower_N_Bend.z > tower_N_Expected_Bend.z ? tower_N_Bend.z - TOWER_BEND_SPEED : tower_N_Bend.z + TOWER_BEND_SPEED);
+          abs(tower_N_Bend.z - tower_N_Expected_Bend.z) < TOWER_BEND_SNAP ? tower_N_Expected_Bend.z :
+            (tower_N_Bend.z > tower_N_Expected_Bend.z ? tower_N_Bend.z - TOWER_BEND_SPEED : tower_N_Bend.z + TOWER_BEND_SPEED));
 
   // MOVE TOWER S
   if (tower_S_Alive) {
@@ -195,9 +197,11 @@ void MyGLWidget::paintGL ()
   }
 
   tower_S_Bend =
-      glm::vec3(tower_S_Bend.x > tower_S_Expected_Bend.x ? tower_S_Bend.x - TOWER_BEND_SPEED : tower_S_Bend.x + TOWER_BEND_SPEED,
+      glm::vec3(abs(tower_S_Bend.x - tower_S_Expected_Bend.x) < TOWER_BEND_SNAP ? tower_S_Expected_Bend.x :
+          (tower_S_Bend.x > tower_S_Expected_Bend.x ? tower_S_Bend.x - TOWER_BEND_SPEED : tower_S_Bend.x + TOWER_BEND_SPEED),
           0,
-          tower_S_Bend.z > tower_S_Expected_Bend.z ? tower_S_Bend.z - TOWER_BEND_SPEED : tower_S_Bend.z + TOWER_BEND_SPEED);
+          abs(tower_S_Bend.z - tower_S_Expected_Bend.z) < TOWER_BEND_SNAP ? tower_S_Expected_Bend.z :
+          (tower_S_Bend.z > tower_S_Expected_Bend.z ? tower_S_Bend.z - TOWER_BEND_SPEED : tower_S_Bend.z + TOWER_BEND_SPEED));
 
   bool col_Tower_N = tower_N_Alive && isPlaneInTower(tower_N_Pos + tower_N_Bend);
   bool col_Tower_S = tower_S_Alive && isPlaneInTower(tower_S_Pos + tower_S_Bend);

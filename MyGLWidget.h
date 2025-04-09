@@ -61,6 +61,7 @@ private:
     const float TOWER_BEND_MAGNITUDE_MAX = 12;
     const float TOWER_BEND_SPEED = 0.16;
     const float TOWER_BEND_DISTANCE = 35;
+    const float TOWER_BEND_SNAP = 0.1;
     bool tower_N_Can_Bend = false;
     bool tower_S_Can_Bend = false;
 
@@ -123,7 +124,7 @@ private:
     // DEBUG SHIT
     const bool DEBUG_SHOW_HITBOXES = false;
     const bool DEBUG_PRINT_COLLISIONS = true;
-    const bool DEBUG_CAN_STOP = true;
+    const bool DEBUG_CAN_STOP = false;
 
     Model model_Debug_Plane;
     Model model_Debug_Tower;
