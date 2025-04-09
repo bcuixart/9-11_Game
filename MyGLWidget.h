@@ -47,7 +47,11 @@ private:
     glm::vec3 tower_S_Pos = glm::vec3(0, 0, -6.4);
 
     const float TOWER_BEND_MAGNITUDE_MAX = 12;
-    const float TOWER_BEND_SPEED = 0.08;
+    const float TOWER_BEND_SPEED = 0.16;
+    const float TOWER_BEND_DISTANCE = 35;
+    bool tower_N_Can_Bend = true;
+    bool tower_S_Can_Bend = true;
+
     glm::vec3 tower_N_Bend = glm::vec3(0, 0, 0);
     glm::vec3 tower_N_Expected_Bend = glm::vec3(0, 0, 0);
     glm::vec3 tower_S_Bend = glm::vec3(0, 0, 0);
