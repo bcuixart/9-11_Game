@@ -128,19 +128,24 @@ void MyGLWidget::paintGL ()
   planeToTowerSVector.y = 0;
 
   // MOVE TOWER N
-  if (tower_N_Can_Move && planeDistN < TOWER_MOVE_DISTANCE) {
-      tower_N_Pos += planeToTowerNVector * TOWER_MOVE_SPEED;
+  if (tower_N_Alive) {
+      if (tower_N_Can_Move && planeDistN < TOWER_MOVE_DISTANCE) {
+          tower_N_Pos += planeToTowerNVector * TOWER_MOVE_SPEED;
 
-      tower_N_Height_Lerp += TOWER_HEIGHT_INCREMENT;
-      if (tower_N_Height_Lerp > 1) tower_N_Height_Lerp = 0;
+          tower_N_Height_Lerp += TOWER_HEIGHT_INCREMENT;
+          if (tower_N_Height_Lerp > 1) tower_N_Height_Lerp = 0;
+      }
+      else {
+          if (tower_N_Height_Lerp > 0) tower_N_Height_Lerp += TOWER_HEIGHT_INCREMENT;
+          if (tower_N_Height_Lerp > 1) tower_N_Height_Lerp = 0;
+      }
   }
   else {
-      if (tower_N_Height_Lerp > 0) tower_N_Height_Lerp += TOWER_HEIGHT_INCREMENT;
-      if (tower_N_Height_Lerp > 1) tower_N_Height_Lerp = 0;
+      tower_N_Height_Lerp -= TOWER_HEIGHT_INCREMENT;
   }
 
   // BEND TOWER N
-  if (tower_N_Can_Bend && planeDistN < TOWER_BEND_DISTANCE) {
+  if (tower_N_Alive && tower_N_Can_Bend && planeDistN < TOWER_BEND_DISTANCE) {
       glm::vec3 possibleBendPos_N_1 = tower_N_Pos + rightVector * TOWER_BEND_MAGNITUDE_MAX;
       glm::vec3 possibleBendPos_N_2 = tower_N_Pos + leftVector * TOWER_BEND_MAGNITUDE_MAX;
 
@@ -159,19 +164,24 @@ void MyGLWidget::paintGL ()
           tower_N_Bend.z > tower_N_Expected_Bend.z ? tower_N_Bend.z - TOWER_BEND_SPEED : tower_N_Bend.z + TOWER_BEND_SPEED);
 
   // MOVE TOWER S
-  if (tower_S_Can_Move && planeDistS < TOWER_MOVE_DISTANCE) {
-      tower_S_Pos += planeToTowerSVector * TOWER_MOVE_SPEED;
+  if (tower_S_Alive) {
+      if (tower_S_Can_Move && planeDistS < TOWER_MOVE_DISTANCE) {
+          tower_S_Pos += planeToTowerSVector * TOWER_MOVE_SPEED;
 
-      tower_S_Height_Lerp += TOWER_HEIGHT_INCREMENT;
-      if (tower_S_Height_Lerp > 1) tower_S_Height_Lerp = 0;
+          tower_S_Height_Lerp += TOWER_HEIGHT_INCREMENT;
+          if (tower_S_Height_Lerp > 1) tower_S_Height_Lerp = 0;
+      }
+      else {
+          if (tower_S_Height_Lerp > 0) tower_S_Height_Lerp += TOWER_HEIGHT_INCREMENT;
+          if (tower_S_Height_Lerp > 1) tower_S_Height_Lerp = 0;
+      }
   }
   else {
-      if (tower_S_Height_Lerp > 0) tower_S_Height_Lerp += TOWER_HEIGHT_INCREMENT;
-      if (tower_S_Height_Lerp > 1) tower_S_Height_Lerp = 0;
+      tower_S_Height_Lerp -= TOWER_HEIGHT_INCREMENT;
   }
 
   // BEND TOWER S
-  if (tower_S_Can_Bend && planeDistS < TOWER_BEND_DISTANCE) {
+  if (tower_S_Alive && tower_S_Can_Bend && planeDistS < TOWER_BEND_DISTANCE) {
       glm::vec3 possibleBendPos_S_1 = tower_S_Pos + rightVector * TOWER_BEND_MAGNITUDE_MAX;
       glm::vec3 possibleBendPos_S_2 = tower_S_Pos + leftVector * TOWER_BEND_MAGNITUDE_MAX;
 
@@ -189,8 +199,25 @@ void MyGLWidget::paintGL ()
           0,
           tower_S_Bend.z > tower_S_Expected_Bend.z ? tower_S_Bend.z - TOWER_BEND_SPEED : tower_S_Bend.z + TOWER_BEND_SPEED);
 
-  bool col_Tower_N = isPlaneInTower(tower_N_Pos + tower_N_Bend);
-  bool col_Tower_S = isPlaneInTower(tower_S_Pos + tower_S_Bend);
+  bool col_Tower_N = tower_N_Alive && isPlaneInTower(tower_N_Pos + tower_N_Bend);
+  bool col_Tower_S = tower_S_Alive && isPlaneInTower(tower_S_Pos + tower_S_Bend);
+
+  if (col_Tower_N) {
+      tower_N_Alive = false;
+      if (tower_S_Alive) {
+          tower_S_Can_Move = false;
+          tower_S_Can_Bend = true;
+      }
+  }
+  
+  if (col_Tower_S) {
+      tower_S_Alive = false;
+      if (tower_N_Alive) {
+          tower_N_Can_Move = false;
+          tower_N_Can_Bend = true;
+      }
+  }
+
   if (DEBUG_PRINT_COLLISIONS) {
     if (col_Tower_N) std::cerr << "Boom torre N" << std::endl;
     if (col_Tower_S) std::cerr << "Boom torre S" << std::endl;

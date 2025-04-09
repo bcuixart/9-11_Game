@@ -45,8 +45,11 @@ private:
 
     glm::vec3 tower_N_Pos = glm::vec3(0, 0, 6.4);
     glm::vec3 tower_S_Pos = glm::vec3(0, 0, -6.4);
+    bool tower_N_Alive = true;
+    bool tower_S_Alive = true;
 
-    const float TOWER_MOVE_SPEED = 0.02;
+    //const float TOWER_MOVE_SPEED = 0.02;
+    const float TOWER_MOVE_SPEED = 0.001;
     const float TOWER_MOVE_DISTANCE = 40;
     const float TOWER_HEIGHT_INCREMENT = 0.01;
     const float TOWER_HEIGHT_JUMP_HEIGHT = 5;
@@ -108,10 +111,9 @@ private:
     float D = 0;
 
     // DEBUG SHIT
-    const bool DEBUG_SHOW_HITBOXES = true;
+    const bool DEBUG_SHOW_HITBOXES = false;
     const bool DEBUG_PRINT_COLLISIONS = true;
     const bool DEBUG_CAN_STOP = true;
-    const bool DEBUG_SHOW_BEND_POS = true;
 
     Model model_Debug_Plane;
     Model model_Debug_Tower;
