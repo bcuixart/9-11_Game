@@ -3,3 +3,4 @@
 moc_*
 *.swp
 ui_MyForm.h
+.qmake.stash
