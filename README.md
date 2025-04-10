@@ -1,5 +1,6 @@
 # 9-11 Game [WIP] (May be offensive)
 ## [NOTE: THIS VERSION HAS BECOME DEPRECATED IN FAVOR OF A NEW VERSION. STUPID QT. CHECK OUT MY PROFILE TO FIND IT.]
+
 ## Lore
 On September 11th, 2001, two planes crashed against the Twin Towers in New York, bringing them down, in a terrorist attack by Al-Qaeda.
 
