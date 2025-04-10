@@ -3,3 +3,6 @@
 moc_*
 *.swp
 ui_MyForm.h
+.qmake.stash
+Makefile
+Assets/Audio/911Game.*
